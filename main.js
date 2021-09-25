@@ -14,6 +14,7 @@ class Sprite {
 	}
 }
 
+
 class Snake extends Sprite {
 	constructor(positionX, positionY) {
 		super(positionX, positionY);
@@ -23,12 +24,10 @@ class Snake extends Sprite {
 
 	updateTail() {
 		// IF tail is less than 4 units AND IF tail unit is not reapeating.
-		if (this.lastPositions.length >= 4 && !this.tailUnitExists()) {
+		if (this.lastPositions.length >= game.getScore() + 1 && !this.tailUnitExists()) {
 			this.lastPositions.shift();
-
 		}
-
-		if (this.lastPositions.length < 4 && !this.tailUnitExists()) {
+		if (this.lastPositions.length < game.getScore() + 1 && !this.tailUnitExists()) {
 			// Add the tail unit to the tail
 			this.lastPositions.push(Object.assign({}, this.position));
 			console.log(this.lastPositions);
@@ -160,7 +159,7 @@ const game = (() => {
 	let columnCount = 1;
 	let rowCount = 1;
 	let pressed;
-	let score = 0;
+	let _score = 0;
 
 	const step = () => {
 		moveSnake(canvas.getGridData(), canvas.getSnake());
@@ -172,6 +171,10 @@ const game = (() => {
 
 		checkWin();
 		checkLost(canvas.getGridData(), canvas.getSnake());
+	}
+
+	const getScore = () => {
+		return _score;
 	}
 
 	const getPressed = () => {
@@ -219,26 +222,26 @@ const game = (() => {
 
 	const checkLost = (gridData, snake) => {
 		if (snake.position.x > (gridData.itemSize * gridData.factor) || snake.position.y > (gridData.itemSize * gridData.factor) || snake.position.y < 0 || snake.position.x < 0) {
-			stop(score);
+			stop();
 		}
 	}
 
 	const checkWin = () => {
 		canvas.getSnake(true).overlap(canvas.getPrize(true), function() {
-			score++;
-			console.log(`Score: ${score}`);
+			_score++;
+			console.log(`Score: ${_score}`);
 			canvas.getPrize(true).remove();
 			canvas.generatePrize();
 		});
 	}
 
-	const stop = (score) => {
+	const stop = () => {
+		pressed = undefined;
+		console.log(`You Lost! Your score is: ${_score}`);
+		_score = 0;
 		canvas.removeSnakeElement();
 		canvas.getSnake().removeTail();
 		canvas.generateSnake();
-		pressed = undefined;
-		console.log(`You Lost! Your score is: ${score}`);
-		score = 0;
 	}
 
 	return {
@@ -247,6 +250,7 @@ const game = (() => {
 		getPressed,
 		moveSnake,
 		step,
+		getScore,
 	}
 
 })();

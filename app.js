@@ -7,7 +7,7 @@ function setup() {
 }
 
 function draw() {
-	// background("pink");
+	background("pink");
 
 	drawSprites();
 
